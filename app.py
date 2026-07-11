@@ -1,12 +1,9 @@
 # ================================================================
-# 🧞 GenIE - ULTRA PROFESSIONAL EDITION
-# Clean • Modern • Enterprise Grade
-# Innoviast Internship - Week 2
+# 🧞 GenIE - Groq Version (FIXED)
 # ================================================================
 
 import streamlit as st
 from groq import Groq
-import groq
 from dotenv import load_dotenv
 import os
 import json
@@ -23,40 +20,34 @@ st.set_page_config(
 )
 
 # ================================================================
-# 🔐 ENVIRONMENT
+# 🔐 ENVIRONMENT - FIXED
 # ================================================================
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    st.error("🚨 GROQ_API_KEY not found! Add it to your .env file. Get a free key (no credit card) at https://console.groq.com/keys")
+    st.error("🚨 GROQ_API_KEY not found! Please add it to your .env file or Streamlit Secrets.")
     st.stop()
 
-# Native Groq SDK client (free tier, no credit card needed).
-client = Groq(api_key=GROQ_API_KEY)
+# ✅ FIXED: Groq client initialization
+try:
+    client = Groq(api_key=GROQ_API_KEY)
+except Exception as e:
+    st.error(f"❌ Groq client initialization failed: {str(e)}")
+    st.stop()
 
 # ================================================================
-# 🧞 SESSION STATE - FIXED
+# 🧞 SESSION STATE
 # ================================================================
 if "output_editor" not in st.session_state:
-    st.session_state.output_editor = ""  # ✅ Widget key
+    st.session_state.output_editor = ""
 if "output_format" not in st.session_state:
     st.session_state.output_format = "Paragraphs"
 if "generation_count" not in st.session_state:
     st.session_state.generation_count = 0
-if "pending_output" not in st.session_state:
-    st.session_state.pending_output = None  # holds content waiting to be applied to output_editor
-if "generation_error" not in st.session_state:
-    st.session_state.generation_error = None
-
-# Apply any pending update to output_editor BEFORE the widget with that key
-# is instantiated further down. This is the only safe place to change it.
-if st.session_state.pending_output is not None:
-    st.session_state.output_editor = st.session_state.pending_output
-    st.session_state.pending_output = None
 
 # ================================================================
-# 🎨 INK & BRASS — SCRIBE'S STUDIO THEME
+# 🎨 CSS (Same as before)
 # ================================================================
 st.markdown("""
 <style>
@@ -91,19 +82,6 @@ st.markdown("""
         color: var(--parchment-100) !important;
     }
 
-    /* Remove Streamlit's default reserved space above the page content,
-       which otherwise shows up as a blank gap above the GenIE header. */
-    .block-container {
-        padding-top: 1rem !important;
-    }
-    header[data-testid="stHeader"] {
-        background: var(--ink-900) !important;
-        height: 2.5rem;
-    }
-    div[data-testid="stDecoration"] {
-        display: none !important;
-    }
-
     /* ============================================================
        HEADER - MASTHEAD
     ============================================================ */
@@ -111,7 +89,7 @@ st.markdown("""
         position: relative;
         text-align: center;
         padding: 2.6rem 0 1.8rem 0;
-        margin: 0 -2rem 2.2rem -2rem;
+        margin: -1rem -2rem 2.2rem -2rem;
         background: linear-gradient(180deg, var(--ink-850) 0%, var(--ink-900) 100%);
         border-bottom: 1px solid var(--ink-700);
         overflow: hidden;
@@ -631,7 +609,7 @@ st.markdown("""
        RESPONSIVE
     ============================================================ */
     @media (max-width: 768px) {
-        .header-container { padding: 2rem 1rem 1.2rem 1rem; margin: 0 -1rem 1.5rem -1rem; }
+        .header-container { padding: 2rem 1rem 1.2rem 1rem; margin: -1rem -1rem 1.5rem -1rem; }
         .logo-text { font-size: 2.6rem; }
         .logo-ornament { margin-bottom: 0.8rem; }
         .st-key-topic_card, .st-key-output_card { padding: 1rem !important; }
@@ -640,7 +618,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ================================================================
-# 📌 HEADER - BIG CENTERED LOGO
+# 📌 HEADER
 # ================================================================
 st.markdown("""
 <div class="header-container">
@@ -695,12 +673,12 @@ with st.sidebar:
     st.markdown(f"""
     <div class="stats-row">
         <div class="stat-item">📊 <strong>{st.session_state.generation_count}</strong> generations</div>
-        <div class="stat-item">⚡ <strong>OpenAI</strong></div>
+        <div class="stat-item">⚡ <strong>Groq</strong></div>
     </div>
     """, unsafe_allow_html=True)
     
     # ============================================================
-    # PRO TIPS - IN SIDEBAR
+    # PRO TIPS
     # ============================================================
     with st.expander("💡 Pro Tips", expanded=False):
         st.markdown("""
@@ -748,7 +726,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
 # ================================================================
-# 📝 MAIN CONTENT - TWO CLEAN BOXES
+# 📝 MAIN CONTENT
 # ================================================================
 col1, col2 = st.columns(2, gap="large")
 
@@ -780,9 +758,6 @@ with col1:
 with col2:
     with st.container(key="output_card"):
         st.markdown('<p class="card-title"><span class="card-title-icon">📄</span> Generated Content</p>', unsafe_allow_html=True)
-
-        if st.session_state.generation_error:
-            st.error(st.session_state.generation_error)
 
         with st.container(key="output_scroll"):
             output_text = st.text_area(
@@ -836,7 +811,7 @@ with col2:
 
             with col_btn4:
                 if st.button("🔄 Clear", use_container_width=True):
-                    st.session_state.pending_output = ""
+                    st.session_state.output_editor = ""
                     st.rerun()
 
             with col_btn5:
@@ -957,49 +932,36 @@ AUDIENCE: {audience}"""
     return prompts.get(template, f"Write about {topic} with {tone} tone for {audience}")
 
 # ================================================================
-# 🧞 GENERATE
+# 🧞 GENERATE - GROQ VERSION
 # ================================================================
 def generate_content(template, tone, length, audience, topic, keywords, output_format):
-    """Returns (content, error_message). Exactly one of them will be non-None."""
     prompt = get_template_prompt(template, topic, tone, length, audience, keywords, output_format)
-
+    
     try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+        chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": "You are an expert content writer with 10+ years of experience."},
                 {"role": "user", "content": prompt}
             ],
+            model="llama-3.3-70b-versatile",
             temperature=0.7,
-            max_tokens=800,
-            top_p=0.9
+            max_tokens=800
         )
-        return response.choices[0].message.content, None
-    except groq.RateLimitError:
-        return None, (
-            "🚫 Groq free-tier rate limit hit (30 requests/min or daily cap). "
-            "Wait a minute and try again, or check console.groq.com/settings/limits."
-        )
-    except groq.AuthenticationError:
-        return None, "🔑 Invalid or missing GROQ_API_KEY. Get a free key at console.groq.com/keys and check your .env file."
+        return chat_completion.choices[0].message.content
     except Exception as e:
-        return None, f"❌ Error: {str(e)}"
+        return f"❌ Error: {str(e)}"
 
 # ================================================================
-# 🧞 GENERATE LOGIC - FIXED
+# 🧞 GENERATE LOGIC
 # ================================================================
 if generate_btn:
     if not topic:
         st.warning("⚠️ Please enter a topic before generating!")
     else:
         with st.spinner("🧞 GenIE is generating your content..."):
-            content, error = generate_content(template, tone, length, audience, topic, keywords, output_format)
-            if error:
-                st.session_state.generation_error = error
-            else:
-                st.session_state.pending_output = content  # applied to output_editor on next run, before widget creation
-                st.session_state.generation_error = None
-                st.session_state.generation_count += 1
+            content = generate_content(template, tone, length, audience, topic, keywords, output_format)
+            st.session_state.output_editor = content
+            st.session_state.generation_count += 1
             st.rerun()
 
 # ================================================================
