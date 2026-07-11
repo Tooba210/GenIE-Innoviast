@@ -35,7 +35,7 @@
 | dotenv | Environment Variables |
 
 ## 🚀 Live Demo
-[Link to your deployed app - Add after deployment]
+https://genie-innoviast-sqexqcdxrjnpwlg8dpxiwy.streamlit.app/
 
 ## 📸 Screenshots
 [Screenshots will be added here]
