@@ -93,7 +93,7 @@ The free Groq tier allows roughly 30 requests/minute and a daily request cap. If
 ![Sidebar Controls](screenshots/features.png)
 
 ### ✍️ caption generator
-![Content Generator](screenshots/captionWriter.png)
+![Content Generator](screenshots/CaptionWriter.png)
 
 ### 📄 Product description
 ![Product description](screenshots/ProductDescription.png)
