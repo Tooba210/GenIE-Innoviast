@@ -1,4 +1,4 @@
-# 🧞 GenIE — AI Content Studio
+# GenIE — AI Content Studio
 
 I built GenIE as a Streamlit web app that generates ready-to-use marketing and content copy — blog posts, LinkedIn posts, emails, ad copy, product descriptions, and captions — from a short topic description. It has a dark "ink & brass" scribe-studio theme and is powered by Groq's free, fast LLM API.
 
@@ -83,6 +83,23 @@ I built GenIE as a Streamlit web app that generates ready-to-use marketing and c
 ## Rate limits
 
 The free Groq tier allows roughly 30 requests/minute and a daily request cap. If you hit the limit, GenIE shows a friendly message instead of crashing — just wait a minute and try again, or check your usage at `console.groq.com/settings/limits`.
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+![Home Page](screenshots/Dashboard.png)
+
+### ⚙️ Sidebar Controls
+![Sidebar Controls](screenshots/features.png)
+
+### ✍️ caption generator
+![Content Generator](screenshots/captionWriter.png)
+
+### 📄 Product description
+![Product description](screenshots/ProductDescription.png)
+
+### 📱 Email writer
+![Email writer](screenshots/EmailWriter.png)
 
 ## License
 
