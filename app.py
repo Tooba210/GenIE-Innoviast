@@ -11,13 +11,20 @@ from dotenv import load_dotenv
 import os
 import json
 from datetime import datetime
+from PIL import Image
 
 # ================================================================
 # 📌 PAGE CONFIG
 # ================================================================
+GENIE_ICON_PATH = os.path.join(os.path.dirname(__file__), "assets", "genie_favicon.png")
+try:
+    genie_page_icon = Image.open(GENIE_ICON_PATH)
+except Exception:
+    genie_page_icon = "🧞"  # fallback if the asset is missing
+
 st.set_page_config(
     page_title="GenIE - AI Content Studio",
-    page_icon="🧞",
+    page_icon=genie_page_icon,
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -26,10 +33,41 @@ st.set_page_config(
 # 🔐 ENVIRONMENT
 # ================================================================
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# On Streamlit Cloud, keys live in st.secrets (Settings > Secrets). Root-level
+# secrets are usually also mirrored to os.environ, but we check st.secrets
+# directly first so this works even if that mirroring doesn't happen yet
+# (e.g. right after adding a secret, before a reboot) or if it's nested
+# under a [section] in secrets.toml.
+#
+# Merely accessing st.secrets when no secrets.toml exists anywhere makes
+# Streamlit render its own "No secrets found" banner directly onto the page
+# (this happens as a side effect, not just a catchable exception) - so we
+# first check whether a secrets.toml is actually present before touching
+# st.secrets at all. This keeps local runs (.env only) clean.
+_secrets_candidates = [
+    os.path.join(os.path.expanduser("~"), ".streamlit", "secrets.toml"),
+    os.path.join(os.getcwd(), ".streamlit", "secrets.toml"),
+    os.path.join(os.path.dirname(__file__), ".streamlit", "secrets.toml"),
+]
+_secrets_file_exists = any(os.path.exists(p) for p in _secrets_candidates)
+
+GROQ_API_KEY = None
+if _secrets_file_exists:
+    try:
+        GROQ_API_KEY = st.secrets.get("GROQ_API_KEY")
+    except Exception:
+        pass
+if not GROQ_API_KEY:
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    st.error("🚨 GROQ_API_KEY not found! Add it to your .env file. Get a free key (no credit card) at https://console.groq.com/keys")
+    st.error(
+        "🚨 GROQ_API_KEY not found! Locally, add it to your .env file. "
+        "On Streamlit Cloud, add it under Settings → Secrets as GROQ_API_KEY = \"...\" "
+        "(root level, not inside a [section]) and reboot the app. "
+        "Get a free key (no credit card) at https://console.groq.com/keys"
+    )
     st.stop()
 
 # Native Groq SDK client (free tier, no credit card needed).
