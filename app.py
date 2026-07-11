@@ -1,11 +1,9 @@
 # ================================================================
-# 🧞 GenIE - CORPORATE PROFESSIONAL UI (FULLY FIXED)
-# No Extra Space • Professional Buttons
-# Innoviast Internship - Week 2
+# 🧞 GenIE - OpenAI Version
 # ================================================================
 
 import streamlit as st
-from groq import Groq
+import openai
 from dotenv import load_dotenv
 import os
 import json
@@ -15,7 +13,7 @@ from datetime import datetime
 # 📌 PAGE CONFIG
 # ================================================================
 st.set_page_config(
-    page_title="GenIE - Enterprise AI Studio",
+    page_title="GenIE - AI Studio",
     page_icon="◆",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -25,13 +23,13 @@ st.set_page_config(
 # 🔐 ENVIRONMENT
 # ================================================================
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-if not GROQ_API_KEY:
-    st.error("🚨 GROQ_API_KEY not found! Please add it to your .env file.")
+if not OPENAI_API_KEY:
+    st.error("🚨 OPENAI_API_KEY not found! Please add it to your .env file.")
     st.stop()
 
-client = Groq(api_key=GROQ_API_KEY)
+openai.api_key = OPENAI_API_KEY
 
 # ================================================================
 # 🧞 SESSION STATE
@@ -44,18 +42,15 @@ if "generation_count" not in st.session_state:
     st.session_state.generation_count = 0
 
 # ================================================================
-# 🎨 PROFESSIONAL CSS - NO EXTRA SPACE
+# 🎨 PROFESSIONAL CSS
 # ================================================================
 st.markdown("""
 <style>
-    /* ===== FONTS ===== */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* ===== ROOT VARIABLES ===== */
     :root {
         --bg-primary: #f5f7fa;
         --bg-secondary: #ffffff;
-        --bg-card: #ffffff;
         --text-primary: #1a1a2e;
         --text-secondary: #4a4a6a;
         --text-muted: #8a8aaa;
@@ -69,7 +64,6 @@ st.markdown("""
         --radius-md: 12px;
     }
     
-    /* ===== GLOBAL ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     .stApp {
@@ -77,7 +71,6 @@ st.markdown("""
         font-family: 'Inter', -apple-system, sans-serif !important;
     }
     
-    /* ===== HEADER ===== */
     .header-wrapper {
         background: var(--bg-secondary);
         padding: 0.7rem 2.5rem;
@@ -91,11 +84,7 @@ st.markdown("""
         box-shadow: var(--shadow-sm);
     }
     
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-    }
+    .header-left { display: flex; align-items: center; gap: 0.7rem; }
     
     .header-logo {
         background: var(--accent-gradient);
@@ -117,9 +106,7 @@ st.markdown("""
         letter-spacing: -0.3px;
     }
     
-    .header-title span {
-        color: var(--accent);
-    }
+    .header-title span { color: var(--accent); }
     
     .header-badge {
         background: var(--accent-light);
@@ -129,15 +116,9 @@ st.markdown("""
         font-size: 0.5rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
     
-    .header-tags {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        flex-wrap: wrap;
-    }
+    .header-tags { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
     
     .tag {
         background: var(--bg-primary);
@@ -155,7 +136,6 @@ st.markdown("""
         border-color: var(--accent);
     }
     
-    /* ===== SIDEBAR ===== */
     [data-testid="stSidebar"] {
         background: var(--bg-secondary) !important;
         border-right: 1px solid var(--border-color) !important;
@@ -194,9 +174,7 @@ st.markdown("""
         color: var(--text-primary);
     }
     
-    .sidebar-brand-text span {
-        color: var(--accent);
-    }
+    .sidebar-brand-text span { color: var(--accent); }
     
     .sidebar-brand-sub {
         font-size: 0.45rem;
@@ -215,7 +193,6 @@ st.markdown("""
         margin-top: 0.8rem !important;
     }
     
-    /* ===== CARDS ===== */
     .card {
         background: var(--bg-secondary);
         border: 1px solid var(--border-color);
@@ -237,58 +214,29 @@ st.markdown("""
         gap: 0.4rem;
     }
     
-    .card-title-icon {
-        color: var(--accent);
-    }
+    .card-title-icon { color: var(--accent); }
     
-    /* ===== FORM ELEMENTS ===== */
-    .stSelectbox > div > div {
-        background: var(--bg-primary) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: var(--radius-sm) !important;
-        min-height: 36px !important;
-        color: var(--text-primary) !important;
-    }
-    
-    .stSelectbox > div > div:focus-within {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08) !important;
-    }
-    
-    .stTextInput > div > div > input {
-        background: var(--bg-primary) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: var(--radius-sm) !important;
-        padding: 0.5rem 0.8rem !important;
-        font-size: 0.8rem !important;
-        color: var(--text-primary) !important;
-        min-height: 36px !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08) !important;
-    }
-    
+    .stSelectbox > div > div,
+    .stTextInput > div > div > input,
     .stTextArea > div > div > textarea {
         background: var(--bg-primary) !important;
         border: 1px solid var(--border-color) !important;
         border-radius: var(--radius-sm) !important;
-        padding: 0.5rem 0.8rem !important;
-        font-size: 0.8rem !important;
         color: var(--text-primary) !important;
-        line-height: 1.6 !important;
-        min-height: 100px !important;
+        transition: all 0.15s ease !important;
     }
     
+    .stSelectbox > div > div { min-height: 36px !important; }
+    .stTextInput > div > div > input { min-height: 36px !important; padding: 0.5rem 0.8rem !important; font-size: 0.8rem !important; }
+    .stTextArea > div > div > textarea { min-height: 100px !important; padding: 0.5rem 0.8rem !important; font-size: 0.8rem !important; line-height: 1.6 !important; }
+    
+    .stSelectbox > div > div:focus-within,
+    .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
         border-color: var(--accent) !important;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08) !important;
     }
     
-    .stSlider > div { padding: 0.2rem 0 !important; }
-    
-    /* ===== LABELS ===== */
     .stSelectbox label,
     .stTextInput label,
     .stTextArea label,
@@ -301,7 +249,6 @@ st.markdown("""
         margin-bottom: 0.15rem !important;
     }
     
-    /* ===== GENERATE BUTTON ===== */
     .stButton > button {
         background: var(--accent-gradient) !important;
         color: white !important;
@@ -322,7 +269,6 @@ st.markdown("""
         box-shadow: 0 6px 24px rgba(37, 99, 235, 0.3) !important;
     }
     
-    /* ===== OUTPUT AREA - COMPACT ===== */
     .output-container {
         background: var(--bg-primary);
         border: 1px solid var(--border-color);
@@ -350,9 +296,6 @@ st.markdown("""
         outline: none !important;
     }
     
-    /* ============================================================
-       PROFESSIONAL TOOLBAR BUTTONS
-    ============================================================ */
     .toolbar {
         display: flex;
         gap: 0.3rem;
@@ -362,7 +305,6 @@ st.markdown("""
         flex-wrap: wrap;
     }
     
-    /* Professional Buttons - Clean & Minimal */
     .toolbar-btn > button {
         background: var(--bg-primary) !important;
         color: var(--text-secondary) !important;
@@ -376,8 +318,6 @@ st.markdown("""
         min-width: 55px !important;
         min-height: 30px !important;
         transition: all 0.15s ease !important;
-        letter-spacing: 0.2px !important;
-        text-transform: none !important;
     }
     
     .toolbar-btn > button:hover {
@@ -388,17 +328,6 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1) !important;
     }
     
-    .toolbar-btn > button:active {
-        transform: translateY(0px) !important;
-    }
-    
-    /* Disabled state ke liye */
-    .toolbar-btn > button:disabled {
-        opacity: 0.4 !important;
-        cursor: not-allowed !important;
-    }
-    
-    /* ===== EXPANDER ===== */
     .streamlit-expanderHeader {
         font-size: 0.65rem !important;
         font-weight: 500 !important;
@@ -409,7 +338,6 @@ st.markdown("""
         padding: 0.3rem 0.7rem !important;
     }
     
-    /* ===== ALERTS ===== */
     .stAlert {
         border-radius: var(--radius-sm) !important;
         border: 1px solid var(--border-color) !important;
@@ -419,14 +347,12 @@ st.markdown("""
         color: var(--text-secondary) !important;
     }
     
-    /* ===== DIVIDER ===== */
     .sidebar-divider {
         border: none;
         border-top: 1px solid var(--border-color);
         margin: 0.8rem 0;
     }
     
-    /* ===== FOOTER ===== */
     .footer {
         text-align: center;
         padding: 1rem 0 0.3rem 0;
@@ -441,45 +367,18 @@ st.markdown("""
         font-weight: 400;
     }
     
-    .footer-text strong { 
-        color: var(--text-secondary); 
-        font-weight: 600;
-    }
+    .footer-text strong { color: var(--text-secondary); font-weight: 600; }
+    .footer-dot { color: var(--accent); font-weight: 700; margin: 0 0.3rem; }
     
-    .footer-dot { 
-        color: var(--accent); 
-        font-weight: 700; 
-        margin: 0 0.3rem; 
-    }
-    
-    /* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg-primary); border-radius: 10px; }
     ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
     
-    /* ===== STATS ===== */
-    .stats-row {
-        display: flex;
-        gap: 0.6rem;
-        padding: 0.2rem 0;
-        flex-wrap: wrap;
-    }
+    .stats-row { display: flex; gap: 0.6rem; padding: 0.2rem 0; flex-wrap: wrap; }
+    .stat-item { display: flex; align-items: center; gap: 0.2rem; font-size: 0.55rem; color: var(--text-muted); }
+    .stat-item strong { color: var(--text-secondary); font-weight: 600; }
     
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        font-size: 0.55rem;
-        color: var(--text-muted);
-    }
-    
-    .stat-item strong {
-        color: var(--text-secondary);
-        font-weight: 600;
-    }
-    
-    /* ===== SAMPLE BOX ===== */
     .sample-box {
         background: var(--bg-primary);
         border-radius: var(--radius-sm);
@@ -493,12 +392,8 @@ st.markdown("""
     
     .sample-box strong { color: var(--accent); }
     
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-        .header-wrapper { 
-            padding: 0.6rem 1rem; 
-            margin: -1rem -1rem 1rem -1rem;
-        }
+        .header-wrapper { padding: 0.6rem 1rem; margin: -1rem -1rem 1rem -1rem; }
         .header-title { font-size: 0.9rem !important; }
         .header-badge { display: none; }
         .card { padding: 0.8rem; }
@@ -519,8 +414,8 @@ st.markdown("""
         </div>
     </div>
     <div class="header-tags">
-        <span class="tag tag-accent">⚡ Groq</span>
-        <span class="tag">Llama 3.3</span>
+        <span class="tag tag-accent">⚡ OpenAI</span>
+        <span class="tag">GPT-3.5</span>
         <span class="tag">v2.0</span>
     </div>
 </div>
@@ -579,7 +474,7 @@ with st.sidebar:
     st.markdown(f"""
     <div class="stats-row">
         <div class="stat-item">📊 <strong>{st.session_state.generation_count}</strong> generations</div>
-        <div class="stat-item">⚡ <strong>Groq</strong> API</div>
+        <div class="stat-item">⚡ <strong>OpenAI</strong></div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -612,7 +507,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
 # ================================================================
-# 📝 MAIN CONTENT - COMPACT & CLEAN
+# 📝 MAIN CONTENT
 # ================================================================
 col1, col2 = st.columns([1, 1.2], gap="medium")
 
@@ -647,9 +542,6 @@ with col2:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<p class="card-title"><span class="card-title-icon">📄</span> Generated Content</p>', unsafe_allow_html=True)
     
-    # ============================================================
-    # CLEAN OUTPUT - NO EXTRA SPACE
-    # ============================================================
     st.markdown('<div class="output-container">', unsafe_allow_html=True)
     
     output_text = st.text_area(
@@ -663,9 +555,6 @@ with col2:
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # ============================================================
-    # PROFESSIONAL TOOLBAR BUTTONS
-    # ============================================================
     st.markdown('<div class="toolbar">', unsafe_allow_html=True)
     col_btn1, col_btn2, col_btn3, col_btn4, col_btn5 = st.columns(5, gap="small")
     
@@ -840,23 +729,23 @@ AUDIENCE: {audience}"""
     return prompts.get(template, f"Write about {topic} with {tone} tone for {audience}")
 
 # ================================================================
-# 🧞 GENERATE
+# 🧞 GENERATE (OpenAI)
 # ================================================================
 def generate_content(template, tone, length, audience, topic, keywords, output_format):
     prompt = get_template_prompt(template, topic, tone, length, audience, keywords, output_format)
     
     try:
-        chat_completion = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an expert content writer with 10+ years of experience."},
                 {"role": "user", "content": prompt}
             ],
-            model="llama-3.3-70b-versatile",
             temperature=0.7,
             max_tokens=800,
             top_p=0.9
         )
-        return chat_completion.choices[0].message.content
+        return response.choices[0].message.content
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
