@@ -216,6 +216,36 @@ st.markdown("""
         font-family: 'JetBrains Mono', monospace;
     }
 
+    .sidebar-brand-row {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0 0 1.1rem 0;
+        margin-bottom: 1.1rem;
+        border-bottom: 1px solid var(--ink-700);
+    }
+
+    .sidebar-brand-text {
+        font-family: 'Fraunces', serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        background: linear-gradient(135deg, var(--brass-300) 0%, var(--brass-500) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+    }
+
+    .sidebar-brand-sub {
+        font-size: 0.5rem;
+        color: var(--muted-400);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-family: 'JetBrains Mono', monospace;
+        margin-top: 0.15rem;
+    }
+
     .sidebar-divider {
         border: none;
         border-top: 1px solid var(--ink-700);
@@ -657,6 +687,32 @@ st.markdown("""
 # ⚙️ SIDEBAR
 # ================================================================
 with st.sidebar:
+    st.markdown("""
+    <div class="sidebar-brand-row">
+        <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="sbLogoRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ecce88"/>
+                    <stop offset="100%" stop-color="#96721f"/>
+                </linearGradient>
+                <linearGradient id="sbLogoFlame" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#57d6bf"/>
+                    <stop offset="100%" stop-color="#ecce88"/>
+                </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#sbLogoRing)" stroke-width="3"/>
+            <circle cx="50" cy="50" r="36" fill="none" stroke="url(#sbLogoRing)" stroke-width="1" opacity="0.45"/>
+            <path d="M50 20 C34 42 30 58 40 72 C44 78 50 80 50 80 C50 80 56 78 60 72 C70 58 66 42 50 20 Z" fill="url(#sbLogoFlame)"/>
+            <path d="M50 40 C43 52 42 62 48 68 C50 70 50 70 50 70 C50 70 50 70 52 68 C58 62 57 52 50 40 Z" fill="#1c1830" opacity="0.4"/>
+            <circle cx="50" cy="11" r="2.6" fill="#ecce88"/>
+        </svg>
+        <div>
+            <div class="sidebar-brand-text">GenIE</div>
+            <div class="sidebar-brand-sub">AI Content Studio</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown('<p class="sidebar-title">⚙️ Studio Controls</p>', unsafe_allow_html=True)
     
     template = st.selectbox(
